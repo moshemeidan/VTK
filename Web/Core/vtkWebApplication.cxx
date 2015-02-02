@@ -197,18 +197,19 @@ vtkUnsignedCharArray* vtkWebApplication::StillRender(vtkRenderWindow* view, int 
   //vtkTimerLog::MarkEndEvent("StillRenderToString");
   //vtkTimerLog::DumpLogWithIndents(&cout, 0.0);
 
-  this->Internals->Encoder->PushAndTakeReference(this->Internals->ObjectIdMap->GetGlobalId(view), image, quality);
+  vtkTypeUInt32 viewID = this->Internals->ObjectIdMap->GetGlobalId(view);
+  this->Internals->Encoder->PushAndTakeReference(viewID, image, quality);
   assert(image == NULL);
 
   if (value.Data == NULL)
     {
     // we need to wait till output is processed.
     //cout << "Flushing" << endl;
-    this->Internals->Encoder->Flush(this->Internals->ObjectIdMap->GetGlobalId(view));
+    this->Internals->Encoder->Flush(viewID);
     //cout << "Done Flushing" << endl;
     }
 
-  bool latest = this->Internals->Encoder->GetLatestOutput(this->Internals->ObjectIdMap->GetGlobalId(view), value.Data);
+  bool latest = this->Internals->Encoder->GetLatestOutput(viewID, value.Data);
   value.HasImagesBeingProcessed = !latest;
   value.NeedsRender = false;
   return value.Data;
